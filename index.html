@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="TYBCA Student Management and Attendance System">
+  <title>TYBCA Student Management System</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="loginScreen" class="login-screen">
+    <div class="login-card">
+      <div class="brand-mark">🎓</div>
+      <h1>Student Management System</h1>
+      <p>TYBCA • Admin Portal</p>
+      <form id="loginForm">
+        <label>Username</label>
+        <input id="loginUsername" type="text" autocomplete="username" value="admin" required>
+        <label>Password</label>
+        <input id="loginPassword" type="password" autocomplete="current-password" placeholder="Enter password" required>
+        <button class="primary full" type="submit">Sign In</button>
+        <small>Demo login: <b>admin</b> / <b>admin123</b></small>
+      </form>
+    </div>
+  </div>
+
+  <div id="app" class="app hidden">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand"><button id="closeMenu" class="menu-close" aria-label="Close menu">×</button>
+        <div class="brand-icon">🎓</div>
+        <div><strong>TYBCA SMS</strong><span>Admin Portal</span></div>
+      </div>
+      <nav>
+        <button class="nav-item active" data-page="dashboard">🏠 <span>Dashboard</span></button>
+        <button class="nav-item" data-page="students">👨‍🎓 <span>Students</span></button>
+        <button class="nav-item" data-page="attendance">📅 <span>Attendance</span></button>
+        <button class="nav-item" data-page="marks">📊 <span>Marks</span></button>
+        <button class="nav-item" data-page="reports">📄 <span>Reports</span></button>
+        <button class="nav-item" data-page="settings">⚙️ <span>Settings</span></button>
+      </nav>
+      <div class="sidebar-bottom">
+        <button id="themeBtn" class="ghost full">🌙 Toggle Theme</button>
+        <button id="logoutBtn" class="danger-outline full">↪ Logout</button>
+      </div>
+    </aside>
+
+    <div id="menuOverlay" class="menu-overlay"></div>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <button id="mobileMenu" class="icon-btn">☰</button>
+          <div class="top-title"><h2 id="pageTitle">Dashboard</h2><span id="todayLabel"></span></div>
+        </div>
+        <div class="admin-chip"><span class="avatar">A</span><div><b>Administrator</b><small>Admin</small></div></div>
+      </header>
+
+      <section id="dashboardPage" class="page active-page">
+        <div class="page-head"><div><h1>Dashboard</h1><p>Overview of your student records and attendance.</p></div><button class="primary" onclick="openStudentModal()">＋ Add Student</button></div>
+        <div class="stat-grid">
+          <div class="stat-card"><div class="stat-icon blue">👨‍🎓</div><div><span>Total Students</span><strong id="statStudents">0</strong></div></div>
+          <div class="stat-card"><div class="stat-icon green">✓</div><div><span>Present Today</span><strong id="statPresent">0</strong></div></div>
+          <div class="stat-card"><div class="stat-icon red">✕</div><div><span>Absent Today</span><strong id="statAbsent">0</strong></div></div>
+          <div class="stat-card"><div class="stat-icon orange">%</div><div><span>Attendance</span><strong id="statAttendance">0%</strong></div></div>
+        </div>
+        <div class="two-col">
+          <div class="panel"><div class="panel-head"><h3>Today's Attendance</h3><button class="link-btn" onclick="showPage('attendance')">Manage →</button></div><div id="attendanceSummary"></div></div>
+          <div class="panel"><div class="panel-head"><h3>Low Attendance</h3><button class="link-btn" onclick="showPage('reports')">View Report →</button></div><div id="lowAttendanceList"></div></div>
+        </div>
+        <div class="panel"><div class="panel-head"><h3>Recent Students</h3><button class="link-btn" onclick="showPage('students')">View All →</button></div><div class="table-wrap"><table><thead><tr><th>Roll</th><th>Name</th><th>PRN</th><th>Course</th><th>Division</th></tr></thead><tbody id="recentStudents"></tbody></table></div></div>
+      </section>
+
+      <section id="studentsPage" class="page">
+        <div class="page-head"><div><h1>Students</h1><p>Add, edit, search and manage student records.</p></div><button class="primary" onclick="openStudentModal()">＋ Add Student</button></div>
+        <div class="toolbar"><input id="studentSearch" class="search" placeholder="🔎 Search by name, roll, PRN or division..."><select id="courseFilter"><option value="">All Courses</option><option>TYBCA</option><option>SYBCA</option><option>FYBCA</option></select><select id="divisionFilter"><option value="">All Divisions</option><option>A</option><option>B</option><option>C</option></select></div>
+        <div class="panel"><div class="table-wrap"><table><thead><tr><th>Roll</th><th>Student</th><th>PRN</th><th>Course</th><th>Division</th><th>Phone</th><th>Actions</th></tr></thead><tbody id="studentsTable"></tbody></table></div></div>
+      </section>
+
+      <section id="attendancePage" class="page">
+        <div class="page-head"><div><h1>Attendance</h1><p>Mark daily attendance and review attendance percentages.</p></div></div>
+        <div class="toolbar"><label class="date-control">Date <input type="date" id="attendanceDate"></label><select id="attendanceSubject"><option>All Subjects</option><option>Communication Network</option><option>DBMS</option><option>Software Engineering</option><option>Web Technology</option><option>Programming</option></select><button class="success" id="markAllPresent">✓ Mark All Present</button><button class="danger" id="markAllAbsent">✕ Mark All Absent</button></div>
+        <div class="mini-stats"><span>Present <b id="attPresent">0</b></span><span>Absent <b id="attAbsent">0</b></span><span>Not Marked <b id="attUnmarked">0</b></span></div>
+        <div class="panel"><div class="table-wrap"><table><thead><tr><th>Roll</th><th>Student</th><th>Division</th><th>Status</th><th>Action</th></tr></thead><tbody id="attendanceTable"></tbody></table></div></div>
+      </section>
+
+      <section id="marksPage" class="page">
+        <div class="page-head"><div><h1>Marks</h1><p>Record internal/exam marks and calculate percentages.</p></div><button class="primary" onclick="openMarksModal()">＋ Add / Update Marks</button></div>
+        <div class="toolbar"><input id="marksSearch" class="search" placeholder="🔎 Search student..."><select id="marksSubjectFilter"><option value="">All Subjects</option><option>Communication Network</option><option>DBMS</option><option>Software Engineering</option><option>Web Technology</option><option>Programming</option></select></div>
+        <div class="panel"><div class="table-wrap"><table><thead><tr><th>Roll</th><th>Student</th><th>Subject</th><th>Internal</th><th>External</th><th>Total</th><th>Percentage</th><th>Grade</th><th>Actions</th></tr></thead><tbody id="marksTable"></tbody></table></div></div>
+      </section>
+
+      <section id="reportsPage" class="page">
+        <div class="page-head"><div><h1>Reports</h1><p>Generate attendance, student and marks summaries.</p></div><div class="actions"><button class="secondary" onclick="printReport()">🖨 Print</button><button class="primary" onclick="exportCSV()">⬇ Export CSV</button></div></div>
+        <div class="report-grid">
+          <div class="report-card"><h3>Overall Attendance</h3><strong id="reportAttendance">0%</strong><div class="progress"><span id="reportProgress"></span></div><p id="reportAttendanceText">No attendance recorded.</p></div>
+          <div class="report-card"><h3>Students</h3><strong id="reportStudents">0</strong><p>Active student records</p></div>
+          <div class="report-card"><h3>Subjects</h3><strong>5</strong><p>Configured subjects</p></div>
+          <div class="report-card"><h3>Low Attendance</h3><strong id="reportLow">0</strong><p>Below 75%</p></div>
+        </div>
+        <div class="panel"><div class="panel-head"><h3>Student Attendance Report</h3><select id="reportThreshold"><option value="75">Below 75%</option><option value="65">Below 65%</option><option value="50">Below 50%</option></select></div><div class="table-wrap"><table><thead><tr><th>Roll</th><th>Student</th><th>Present</th><th>Absent</th><th>Marked Days</th><th>Attendance</th><th>Status</th></tr></thead><tbody id="reportTable"></tbody></table></div></div>
+      </section>
+
+      <section id="settingsPage" class="page">
+        <div class="page-head"><div><h1>Settings</h1><p>Configure the demo system and manage local data.</p></div></div>
+        <div class="settings-grid">
+          <div class="panel"><h3>College Details</h3><label>College Name<input id="collegeName" value="TYBCA College"></label><label>Academic Year<input id="academicYear" value="2026-27"></label><button class="primary" id="saveSettings">Save Settings</button></div>
+          <div class="panel"><h3>Data Management</h3><p class="muted">Your current demo data is stored locally in this browser.</p><div class="stack"><button class="secondary" id="backupBtn">⬇ Download Backup</button><label class="file-btn">⬆ Restore Backup<input id="restoreInput" type="file" accept="application/json" hidden></label><button class="danger" id="resetBtn">Reset Demo Data</button></div></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="studentModal" class="modal hidden"><div class="modal-card"><div class="modal-head"><h3 id="studentModalTitle">Add Student</h3><button class="close" onclick="closeModal('studentModal')">×</button></div><form id="studentForm"><input type="hidden" id="editStudentId"><div class="form-grid"><label>Roll No<input id="studentRoll" type="number" min="1" required></label><label>Student Name<input id="studentName" required></label><label>PRN / Student ID<input id="studentPrn" required></label><label>Course<select id="studentCourse"><option>TYBCA</option><option>SYBCA</option><option>FYBCA</option></select></label><label>Division<select id="studentDivision"><option>A</option><option>B</option><option>C</option></select></label><label>Phone<input id="studentPhone" type="tel"></label><label>Email<input id="studentEmail" type="email"></label><label>Gender<select id="studentGender"><option>Male</option><option>Female</option><option>Other</option></select></label></div><div class="modal-actions"><button type="button" class="secondary" onclick="closeModal('studentModal')">Cancel</button><button class="primary" type="submit">Save Student</button></div></form></div></div>
+
+  <div id="marksModal" class="modal hidden"><div class="modal-card"><div class="modal-head"><h3>Add / Update Marks</h3><button class="close" onclick="closeModal('marksModal')">×</button></div><form id="marksForm"><div class="form-grid"><label>Student<select id="marksStudent" required></select></label><label>Subject<select id="marksSubject"><option>Communication Network</option><option>DBMS</option><option>Software Engineering</option><option>Web Technology</option><option>Programming</option></select></label><label>Internal (30)<input id="internalMarks" type="number" min="0" max="30" required></label><label>External (70)<input id="externalMarks" type="number" min="0" max="70" required></label></div><div class="modal-actions"><button type="button" class="secondary" onclick="closeModal('marksModal')">Cancel</button><button class="primary" type="submit">Save Marks</button></div></form></div></div>
+
+  <div id="toast" class="toast"></div>
+  <script src="script.js"></script>
+</body>
+</html>
